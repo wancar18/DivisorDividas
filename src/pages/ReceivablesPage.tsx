@@ -14,9 +14,11 @@ import { Receivable } from '@/types';
 import { toast } from 'sonner';
 
 const ReceivablesPage = () => {
-  const { receivables, settings, selectedMonth, addReceivable, updateReceivable, deleteReceivable } = useApp();
+  const { receivables, settings, selectedMonth, addReceivable, updateReceivable, deleteReceivable, addCategory } = useApp();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingReceivable, setEditingReceivable] = useState<Receivable | null>(null);
+  const [isAddingCategory, setIsAddingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   const monthReceivables = receivables.filter(rec => isSameMonth(rec.dueDate, selectedMonth));
 
@@ -91,6 +93,24 @@ const ReceivablesPage = () => {
     toast.success('Recebível excluído');
   };
 
+  const handleAddCategory = () => {
+    if (!newCategoryName.trim()) {
+      toast.error('Digite o nome da categoria');
+      return;
+    }
+    
+    addCategory({
+      id: Date.now().toString(),
+      name: newCategoryName,
+      type: 'income',
+    });
+    
+    setFormData({ ...formData, category: newCategoryName });
+    setNewCategoryName('');
+    setIsAddingCategory(false);
+    toast.success('Categoria adicionada com sucesso');
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -137,16 +157,63 @@ const ReceivablesPage = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="category">Categoria *</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {settings.incomeCategories.map(cat => (
-                        <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {!isAddingCategory ? (
+                    <div className="flex gap-2">
+                      <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {settings.incomeCategories.map(cat => (
+                            <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Button 
+                        type="button" 
+                        size="icon" 
+                        variant="outline"
+                        onClick={() => setIsAddingCategory(true)}
+                        title="Adicionar nova categoria"
+                      >
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Nome da categoria"
+                        value={newCategoryName}
+                        onChange={(e) => setNewCategoryName(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            handleAddCategory();
+                          }
+                        }}
+                        autoFocus
+                      />
+                      <Button 
+                        type="button" 
+                        size="icon" 
+                        variant="default"
+                        onClick={handleAddCategory}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        type="button" 
+                        size="icon" 
+                        variant="outline"
+                        onClick={() => {
+                          setIsAddingCategory(false);
+                          setNewCategoryName('');
+                        }}
+                      >
+                        ×
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="dueDate">Data de Recebimento *</Label>
