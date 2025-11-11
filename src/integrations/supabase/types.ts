@@ -14,7 +14,174 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          description: string
+          due_date: string
+          id: string
+          installment_current: number | null
+          installment_total: number | null
+          is_essential: boolean | null
+          paid_by: string | null
+          paid_date: string | null
+          split_between: string[]
+          status: string
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          description: string
+          due_date: string
+          id?: string
+          installment_current?: number | null
+          installment_total?: number | null
+          is_essential?: boolean | null
+          paid_by?: string | null
+          paid_date?: string | null
+          split_between?: string[]
+          status: string
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          description?: string
+          due_date?: string
+          id?: string
+          installment_current?: number | null
+          installment_total?: number | null
+          is_essential?: boolean | null
+          paid_by?: string | null
+          paid_date?: string | null
+          split_between?: string[]
+          status?: string
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      people: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          id: string
+          monthly_income: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id: string
+          monthly_income?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          monthly_income?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      receivables: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          description: string
+          due_date: string
+          id: string
+          received_by: string | null
+          received_date: string | null
+          split_between: string[]
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          description: string
+          due_date: string
+          id?: string
+          received_by?: string | null
+          received_date?: string | null
+          split_between?: string[]
+          status: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          description?: string
+          due_date?: string
+          id?: string
+          received_by?: string | null
+          received_date?: string | null
+          split_between?: string[]
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
