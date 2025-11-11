@@ -1,7 +1,9 @@
 import { ReactNode } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Home, DollarSign, TrendingUp, Settings } from 'lucide-react';
+import { Home, DollarSign, TrendingUp, Settings, LogOut } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from './ui/button';
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,6 +12,7 @@ interface LayoutProps {
 const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { signOut } = useAuth();
   
   const currentTab = location.pathname.slice(1) || 'inicio';
 
@@ -20,9 +23,14 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b bg-card sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-primary">Divisão de Contas</h1>
-          <p className="text-sm text-muted-foreground">Gerencie suas finanças compartilhadas</p>
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-primary">Divisão de Contas</h1>
+            <p className="text-sm text-muted-foreground">Gerencie suas finanças compartilhadas</p>
+          </div>
+          <Button variant="outline" size="icon" onClick={signOut} title="Sair">
+            <LogOut className="h-4 w-4" />
+          </Button>
         </div>
       </header>
 
