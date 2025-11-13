@@ -1,69 +1,75 @@
 import { useState, useEffect } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
+import { localDb } from '@/lib/localDb';
+
+interface User {
+  id: string;
+  email: string;
+}
 
 export const useAuth = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Check for stored user session
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+    setLoading(false);
   }, []);
 
   const signUp = async (email: string, password: string) => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: redirectUrl
+    try {
+      // Check if user already exists
+      const existingUser = await localDb.getUserByEmail(email);
+      if (existingUser) {
+        return { error: { message: 'Usuário já existe' } };
       }
-    });
-    
-    return { error };
+
+      const newUser = await localDb.createUser(email, password);
+      const userData = { id: newUser.id, email: newUser.email };
+      
+      setUser(userData);
+      localStorage.setItem('currentUser', JSON.stringify(userData));
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Sign up error:', error);
+      return { error: { message: 'Erro ao criar conta' } };
+    }
   };
 
   const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (!error) {
+    try {
+      const existingUser = await localDb.getUserByEmail(email);
+      
+      if (!existingUser || existingUser.password !== password) {
+        return { error: { message: 'Email ou senha inválidos' } };
+      }
+
+      const userData = { id: existingUser.id, email: existingUser.email };
+      setUser(userData);
+      localStorage.setItem('currentUser', JSON.stringify(userData));
       navigate('/');
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Sign in error:', error);
+      return { error: { message: 'Erro ao fazer login' } };
     }
-    
-    return { error };
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    setUser(null);
+    localStorage.removeItem('currentUser');
     navigate('/auth');
   };
 
   return {
     user,
-    session,
     loading,
     signUp,
     signIn,
