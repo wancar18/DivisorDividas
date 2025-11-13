@@ -46,6 +46,7 @@ const AuthPage = () => {
       toast.error(error.message);
     } else {
       toast.success('Conta criada com sucesso!');
+      navigate('/');
     }
 
     setLoading(false);
@@ -87,6 +88,7 @@ const AuthPage = () => {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
+                    minLength={6}
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={loading}>
@@ -127,6 +129,9 @@ const AuthPage = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
+        <CardFooter className="text-sm text-muted-foreground text-center">
+          Seus dados são armazenados localmente no seu navegador
+        </CardFooter>
       </Card>
     </div>
   );
